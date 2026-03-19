@@ -20,6 +20,7 @@
             background: linear-gradient(135deg, #f8fafc 0%, #e8f1f7 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 2rem;
@@ -423,6 +424,60 @@
             border-color: #059669;
         }
 
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: #FF7849;
+            background: #fff8f6;
+        }
+
+        .upload-area.file-ready {
+            border-color: #059669;
+            background: #f0fdf4;
+        }
+
+        .upload-step-banner {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 0.875rem 1.125rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.625rem;
+        }
+
+        .upload-step-banner .step-num {
+            background: #FF7849;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .upload-step-banner p {
+            font-size: 0.875rem;
+            color: #9a3412;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
         .tax-checkbox svg {
             width: 12px;
             height: 12px;
@@ -627,6 +682,9 @@
 
         <!-- Step 1: Login/Verify -->
         <div class="step active" id="loginStep">
+            <div style="text-align:center; margin-bottom: 1.5rem;">
+                <img src="beycome_logo.png" alt="Beycome" style="height: 52px;">
+            </div>
             <div class="step-header">
                 <div class="step-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -688,6 +746,10 @@
                         <span class="info-value" id="invoiceNumberDisplay">-</span>
                     </div>
                     <div class="info-row">
+                        <span class="info-label">Department</span>
+                        <span class="info-value" id="departmentDisplay">-</span>
+                    </div>
+                    <div class="info-row">
                         <span class="info-label">Payment Method</span>
                         <span class="info-value" id="paymentMethodDisplay">-</span>
                     </div>
@@ -710,8 +772,8 @@
                             <input type="number" id="incentives" class="form-input" placeholder="$0.00" step="0.01" min="0">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Bonuses</label>
-                            <input type="number" id="bonuses" class="form-input" placeholder="$0.00" step="0.01" min="0">
+                            <label class="form-label">Overtime</label>
+                            <input type="number" id="overtime" class="form-input" placeholder="$0.00" step="0.01" min="0">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Deductions</label>
@@ -720,14 +782,10 @@
                     </div>
                 </div>
 
-                <!-- Sales Details -->
+                <!-- Optional Details -->
                 <div class="form-section show">
                     <div class="form-section-title">Optional Details</div>
                     <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label class="form-label">Sales Breakdown (for commission)</label>
-                            <textarea id="salesDetails" class="form-input" placeholder="e.g., Property 123 Main St - $500&#10;Property 456 Oak Ave - $350"></textarea>
-                        </div>
                         <div class="form-group full-width">
                             <label class="form-label">Additional Notes</label>
                             <textarea id="notes" class="form-input" placeholder="Any other notes for this invoice..."></textarea>
@@ -770,6 +828,10 @@
                         <span class="confirm-value" id="confirmName">-</span>
                     </div>
                     <div class="confirm-row">
+                        <span class="confirm-label">Department</span>
+                        <span class="confirm-value" id="confirmDepartment">-</span>
+                    </div>
+                    <div class="confirm-row">
                         <span class="confirm-label">Pay Period</span>
                         <span class="confirm-value" id="confirmPeriod">-</span>
                     </div>
@@ -800,9 +862,9 @@
                         <span class="confirm-label">Incentives</span>
                         <span class="confirm-value" id="confirmIncentives">-</span>
                     </div>
-                    <div class="confirm-row" id="confirmBonusesRow" style="display: none;">
-                        <span class="confirm-label">Bonuses</span>
-                        <span class="confirm-value" id="confirmBonuses">-</span>
+                    <div class="confirm-row" id="confirmOvertimeRow" style="display: none;">
+                        <span class="confirm-label">Overtime</span>
+                        <span class="confirm-value" id="confirmOvertime">-</span>
                     </div>
                     <div class="confirm-row" id="confirmDeductionsRow" style="display: none;">
                         <span class="confirm-label">Deductions</span>
@@ -840,60 +902,59 @@
             </div>
         </div>
 
-        <!-- Step 4: Upload PDF -->
+        <!-- Step 4: Upload & Submit -->
         <div class="step" id="successStep">
             <div class="step-header">
-                <div class="step-icon success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                <div class="step-icon" style="background:#fff3ec;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#FF7849" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                     </svg>
                 </div>
                 <h1 class="step-title">Invoice Downloaded!</h1>
-                <p class="step-subtitle">Now upload the PDF below to submit it to Beycome</p>
+                <p class="step-subtitle">One more step — upload & submit to Beycome</p>
             </div>
 
-            <div class="success-badge">
-                <div class="success-badge-title" id="invoiceSummary">Invoice Ready</div>
-                <div class="success-badge-text" id="successMessage">Your PDF has been saved to your device. Please upload it below.</div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:0.875rem 1.125rem; margin-bottom:1.25rem;">
+                <div style="font-weight:600; color:#152330; font-size:0.9rem;" id="invoiceSummary">Invoice Ready</div>
+                <div style="font-size:0.8rem; color:#64748b; margin-top:0.2rem;" id="successMessage">Invoice has been downloaded</div>
             </div>
 
-            <!-- Upload Area -->
-            <form id="pdfUploadForm" method="POST">
-            <div id="uploadArea" style="
-                border: 2px dashed #e2e8f0;
-                border-radius: 14px;
-                padding: 2rem;
-                text-align: center;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                margin-bottom: 1.5rem;
-                background: #f8fafc;
-            " onclick="document.getElementById('pdfUpload').click()"
-               ondragover="event.preventDefault(); this.style.borderColor='#FF7849'; this.style.background='#FFF4F0';"
-               ondragleave="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc';"
-               ondrop="handleDrop(event)">
-                <input type="file" id="pdfUpload" name="attachment" accept=".pdf" style="display:none;" onchange="handleFileSelect(event)">
+            <div class="upload-step-banner">
+                <span class="step-num">1</span>
+                <p>Your PDF was just downloaded. Find it in your Downloads folder, then upload it below.</p>
+            </div>
+
+            <div id="uploadArea" class="upload-area"
+                 ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                 ondragleave="this.classList.remove('drag-over')"
+                 ondrop="handleDrop(event)"
+                 onclick="document.getElementById('pdfFileInput').click()">
+                <input type="file" id="pdfFileInput" accept=".pdf" style="display:none" onchange="handleFileSelect(event)">
                 <div id="uploadPrompt">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#FF7849" style="width:40px;height:40px;margin:0 auto 1rem;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#FF7849" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                     </svg>
-                    <p style="font-weight:600;color:#152330;margin-bottom:0.25rem;">Click or drag your PDF here</p>
-                    <p style="font-size:0.8rem;color:#94a3b8;">Upload the invoice that just downloaded</p>
+                    <p style="font-weight:600; color:#152330; margin-top:0.5rem;">Click or drag your PDF here</p>
+                    <p style="font-size:0.8rem; color:#94a3b8; margin-top:0.2rem;">Upload the invoice that just downloaded</p>
                 </div>
-                <div id="uploadSelected" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#059669" style="width:36px;height:36px;margin:0 auto 0.75rem;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <div id="uploadSelected" style="display:none; text-align:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p id="selectedFileName" style="font-weight:600;color:#065F46;margin-bottom:0.25rem;"></p>
-                    <p style="font-size:0.8rem;color:#059669;">✓ Ready to submit — click below</p>
+                    <p style="color:#059669; font-weight:600; margin-top:0.4rem;">PDF ready to submit</p>
+                    <p id="selectedFileName" style="font-size:0.8rem; color:#64748b; margin-top:0.2rem;"></p>
                 </div>
             </div>
-            </form>
 
-            <button class="btn-primary show" id="submitPdfBtn" onclick="submitPDF()" disabled style="opacity:0.5;">
+            <div class="upload-step-banner">
+                <span class="step-num">2</span>
+                <p>Click <strong>Submit Invoice to Beycome</strong> below to send it to Sam.</p>
+            </div>
+
+            <button class="btn-primary show" id="submitPdfBtn" disabled onclick="submitPDF()" style="opacity:0.5;">
                 Submit Invoice to Beycome
             </button>
-            <button class="btn-secondary" onclick="window.location.reload()">
+            <button class="btn-secondary" style="margin-top:0.75rem; width:100%;" onclick="window.location.reload()">
                 Start Over
             </button>
         </div>
@@ -911,8 +972,8 @@
             </div>
 
             <div class="success-badge">
-                <div class="success-badge-title" id="finalInvoiceSummary">Invoice Submitted</div>
-                <div class="success-badge-text">Sam will receive your invoice shortly at sam@beycome.com</div>
+                <div class="success-badge-title">Invoice Submitted</div>
+                <div class="success-badge-text">Sam will receive your invoice shortly at <strong>sam@beycome.com</strong></div>
             </div>
 
             <button class="btn-primary show" onclick="window.location.reload()">
@@ -921,26 +982,43 @@
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        // Contractor data with base salary, payment method, and unique code
+
+    <script>
+        // Preload Beycome logo for PDF
+        window.beycomLogoData = null;
+        const logoImg = new Image();
+        logoImg.crossOrigin = 'Anonymous';
+        logoImg.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = logoImg.width;
+            canvas.height = logoImg.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(logoImg, 0, 0);
+            window.beycomLogoData = canvas.toDataURL('image/png');
+        };
+        logoImg.src = 'beycome_logo.png';
+
+        // Contractor data with base salary, payment method, department, and unique code
         const contractors = [
-            { name: "Kevin Gutierrez", salary: 500, payment: "Wire", code: "KEV4821" },
-            { name: "Rose Florence", salary: 500, payment: "PayPal", code: "ROS7392" },
-            { name: "Omran Terro", salary: 850, payment: "Wire", code: "OMR5147" },
-            { name: "Marc Jayrold", salary: 425, payment: "PayPal", code: "MAR8264" },
-            { name: "Kshamal Zatakia", salary: 350, payment: "PayPal", code: "KSH3958" },
-            { name: "Istiak Ahmed", salary: 1500, payment: "Wire", code: "IST2849" },
-            { name: "Maruf Alom", salary: 1350, payment: "Wire", code: "MAR9156" },
-            { name: "Christian Linaza", salary: 525, payment: "PayPal", code: "CHR4738" },
-            { name: "Kenneth Vanegas", salary: 650, payment: "Wire", code: "KEN5827" },
-            { name: "Mark Aldrin Quillosa", salary: 300, payment: "PayPal", code: "MAR3649" },
-            { name: "Warren Mckray", salary: 300, payment: "PayPal", code: "WAR8472" },
-            { name: "Giebelle Abella", salary: 300, payment: "PayPal", code: "GIE2958" },
-            { name: "Karinna Gutierez", salary: 475, payment: "Wire", code: "KAR7361" },
-            { name: "Michael Vincent", salary: 325, payment: "PayPal", code: "MIC4829" },
-            { name: "Lindy Linaza", salary: 325, payment: "PayPal", code: "LIN6284" },
-            { name: "Rudy Vivas", salary: 350, payment: "Wire", code: "RUD7534" },
-            { name: "Alvaro Torres", salary: 525, payment: "Wire", code: "ALV3947" }
+            { name: "Kevin Gutierrez", salary: 500, payment: "Wire", department: "Flat Fee Sales", code: "KEV4821" },
+            { name: "Rose Florence", salary: 500, payment: "PayPal", department: "Flat Fee Sales", code: "ROS7392" },
+            { name: "Omran Terro", salary: 850, payment: "Wire", department: "Flat Fee Sales", code: "OMR5147" },
+            { name: "Marc Jayrold", salary: 425, payment: "PayPal", department: "Flat Fee Sales", code: "MAR8264" },
+            { name: "Kshamal Zatakia", salary: 350, payment: "PayPal", department: "Flat Fee Sales", code: "KSH3958" },
+            { name: "Jimmy Hodgson", salary: 425, payment: "Wire", department: "Flat Fee Sales", code: "JIM5739" },
+            { name: "Pedro Gonzalez", salary: 400, payment: "Wire", department: "Flat Fee Sales", code: "PED6473" },
+            { name: "Jose Orozco", salary: 400, payment: "Wire", department: "Flat Fee Sales", code: "JOS8294" },
+            { name: "Istiak Ahmed", salary: 1500, payment: "Wire", department: "Dev Team", code: "IST2849" },
+            { name: "Maruf Alom", salary: 1350, payment: "Wire", department: "Dev Team", code: "MAR9156" },
+            { name: "Christian Linaza", salary: 525, payment: "PayPal", department: "Buyer Program", code: "CHR4738" },
+            { name: "Kenneth Vanegas", salary: 650, payment: "Wire", department: "Customer Service", code: "KEN5827" },
+            { name: "Mark Aldrin Quillosa", salary: 300, payment: "PayPal", department: "Customer Service", code: "MAR3649" },
+            { name: "Warren Mckray", salary: 300, payment: "PayPal", department: "Customer Service", code: "WAR8472" },
+            { name: "Giebelle Abella", salary: 350, payment: "PayPal", department: "Customer Service", code: "GIE2958" },
+            { name: "Karinna Gutierez", salary: 475, payment: "Wire", department: "Data Entry", code: "KAR7361" },
+            { name: "Michael Vincent", salary: 300, payment: "PayPal", department: "Data Entry", code: "MIC4829" },
+            { name: "Lindy Linaza", salary: 325, payment: "PayPal", department: "Data Entry", code: "LIN6284" },
+            { name: "Alvaro Torres", salary: 525, payment: "Wire", department: "Data Entry", code: "ALV3947" }
         ];
 
         // Current state
@@ -1033,6 +1111,7 @@
                 document.getElementById('verifiedName').textContent = contractor.name;
                 document.getElementById('payPeriodDisplay').textContent = getPayPeriod();
                 document.getElementById('invoiceNumberDisplay').textContent = generateInvoiceNumber(contractor.name);
+                document.getElementById('departmentDisplay').textContent = contractor.department;
                 document.getElementById('paymentMethodDisplay').textContent = contractor.payment;
                 document.getElementById('baseSalaryDisplay').textContent = '$' + contractor.salary.toFixed(2);
                 
@@ -1053,15 +1132,15 @@
             const baseSalary = selectedContractor ? selectedContractor.salary : 0;
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
+            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
-            
-            const total = baseSalary + commissions + incentives + bonuses - deductions;
+
+            const total = baseSalary + commissions + incentives + overtime - deductions;
             document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
         }
 
         // Listen for changes on earning fields
-        ['commissions', 'incentives', 'bonuses', 'deductions'].forEach(id => {
+        ['commissions', 'incentives', 'overtime', 'deductions'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateTotal);
         });
 
@@ -1074,15 +1153,16 @@
         function showConfirmation() {
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
+            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
-            const total = selectedContractor.salary + commissions + incentives + bonuses - deductions;
+            const total = selectedContractor.salary + commissions + incentives + overtime - deductions;
             
             // Update progress bar
             document.getElementById('progressFill').style.width = '75%';
             
             // Populate confirmation
             document.getElementById('confirmName').textContent = selectedContractor.name;
+            document.getElementById('confirmDepartment').textContent = selectedContractor.department;
             document.getElementById('confirmPeriod').textContent = getPayPeriod();
             document.getElementById('confirmInvoice').textContent = generateInvoiceNumber(selectedContractor.name);
             document.getElementById('confirmPayment').textContent = selectedContractor.payment;
@@ -1103,13 +1183,13 @@
                 document.getElementById('confirmIncentivesRow').style.display = 'none';
             }
             
-            if (bonuses > 0) {
-                document.getElementById('confirmBonusesRow').style.display = 'flex';
-                document.getElementById('confirmBonuses').textContent = '$' + bonuses.toFixed(2);
+            if (overtime > 0) {
+                document.getElementById('confirmOvertimeRow').style.display = 'flex';
+                document.getElementById('confirmOvertime').textContent = '$' + overtime.toFixed(2);
             } else {
-                document.getElementById('confirmBonusesRow').style.display = 'none';
+                document.getElementById('confirmOvertimeRow').style.display = 'none';
             }
-            
+
             if (deductions > 0) {
                 document.getElementById('confirmDeductionsRow').style.display = 'flex';
                 document.getElementById('confirmDeductions').textContent = '-$' + deductions.toFixed(2);
@@ -1153,295 +1233,37 @@
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Generating...';
-            
-            setTimeout(async () => {
-                const result = await generatePDF();
-                
+
+            setTimeout(() => {
+                const result = generatePDF();
+
                 // Update progress bar
                 document.getElementById('progressFill').style.width = '100%';
-                
-                document.getElementById('successMessage').textContent = 
+
+                document.getElementById('successMessage').textContent =
                     `Invoice for ${result.agentName} has been downloaded`;
-                document.getElementById('invoiceSummary').textContent = 
+                document.getElementById('invoiceSummary').textContent =
                     `Invoice #${result.invoiceNumber} - Total: $${result.total.toFixed(2)}`;
-                
+
+                // Reset upload state
+                selectedPdfFile = null;
+                document.getElementById('uploadPrompt').style.display = 'block';
+                document.getElementById('uploadSelected').style.display = 'none';
+                const uploadArea = document.getElementById('uploadArea');
+                uploadArea.style.borderColor = '';
+                uploadArea.style.background = '';
+                uploadArea.className = 'upload-area';
+                const pdfBtn = document.getElementById('submitPdfBtn');
+                pdfBtn.disabled = true;
+                pdfBtn.style.opacity = '0.5';
+                pdfBtn.textContent = 'Submit Invoice to Beycome';
+
                 document.getElementById('confirmStep').classList.remove('active');
                 document.getElementById('successStep').classList.add('active');
-                
+
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Generate PDF';
             }, 500);
-        }
-
-        // Helper to load image as high-res base64 for jsPDF
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = function() {
-                    const scale = 3; // 3x resolution for crisp rendering
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.scale(scale, scale);
-                    ctx.drawImage(img, 0, 0);
-                    resolve(canvas.toDataURL('image/png'));
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // Generate PDF
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            const agentName = selectedContractor.name;
-            const baseSalary = selectedContractor.salary;
-            const paymentType = selectedContractor.payment;
-            const commissions = parseFloat(document.getElementById('commissions').value) || 0;
-            const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
-            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
-            const salesDetails = document.getElementById('salesDetails').value;
-            const notes = document.getElementById('notes').value;
-            const invoiceNumber = generateInvoiceNumber(agentName);
-            const payPeriod = getPayPeriod();
-            
-            const total = baseSalary + commissions + incentives + bonuses - deductions;
-            
-            // Colors
-            const coral = [255, 120, 73];
-            const navy = [21, 35, 48];
-            const gray = [100, 116, 139];
-            const lightGray = [148, 163, 184];
-            
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const margin = 20;
-            const contentWidth = pageWidth - (margin * 2);
-            
-            // Header - white background, no fill
-            const logoUrl = 'https://samodiofl-boop.github.io/beycome-invoices/assets/beycome-logo.png';
-            try {
-                const img = await loadImage(logoUrl);
-                doc.addImage(img, 'PNG', margin, 8, 60, 24, undefined, 'FAST');
-            } catch(e) {
-                doc.setTextColor(...navy);
-                doc.setFontSize(20);
-                doc.setFont('helvetica', 'bold');
-                doc.text('beycome', margin, 28);
-            }
-            
-            // Main content box
-            const boxY = 55;
-            const boxHeight = 180;
-            doc.setDrawColor(229, 231, 235);
-            doc.setLineWidth(0.5);
-            doc.roundedRect(margin, boxY, contentWidth, boxHeight, 3, 3, 'S');
-            
-            let y = boxY + 15;
-            
-            // FROM section
-            doc.setTextColor(...lightGray);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            doc.text('FROM:', margin + 10, y);
-            
-            // Invoice # on right
-            doc.setTextColor(...coral);
-            doc.setFontSize(9);
-            doc.text('INVOICE #: ' + invoiceNumber, pageWidth - margin - 10, y, { align: 'right' });
-            
-            y += 8;
-            doc.setTextColor(...navy);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text(agentName, margin + 10, y);
-            
-            // Date on right
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            doc.setTextColor(...gray);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Date: ' + dateStr, pageWidth - margin - 10, y, { align: 'right' });
-            
-            y += 6;
-            doc.setTextColor(...gray);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            const firstName = agentName.split(' ')[0].toLowerCase();
-            doc.text(firstName + '@beycome.com', margin + 10, y);
-            
-            doc.text('Period: ' + payPeriod, pageWidth - margin - 10, y, { align: 'right' });
-            
-            // BILL TO section
-            y += 18;
-            doc.setTextColor(...lightGray);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            doc.text('BILL TO:', margin + 10, y);
-            
-            y += 8;
-            doc.setTextColor(...navy);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Beycome Corp.', margin + 10, y);
-            
-            y += 6;
-            doc.setTextColor(...gray);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text('sam@beycome.com', margin + 10, y);
-            y += 5;
-            doc.text('5701 Sunset Drive, #224', margin + 10, y);
-            y += 5;
-            doc.text('South Miami, Florida, USA', margin + 10, y);
-            
-            // Line items
-            y += 18;
-            
-            // Base Salary line
-            doc.setTextColor(...navy);
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Bi-Weekly Base Salary', margin + 10, y);
-            doc.text('$' + baseSalary.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-            
-            if (commissions > 0) {
-                y += 8;
-                doc.text('Commissions', margin + 10, y);
-                doc.text('$' + commissions.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-            }
-            
-            if (incentives > 0) {
-                y += 8;
-                doc.text('Incentives', margin + 10, y);
-                doc.text('$' + incentives.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-            }
-            
-            if (bonuses > 0) {
-                y += 8;
-                doc.text('Bonuses', margin + 10, y);
-                doc.text('$' + bonuses.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-            }
-            
-            if (deductions > 0) {
-                y += 8;
-                doc.setTextColor(220, 38, 38);
-                doc.text('Deductions', margin + 10, y);
-                doc.text('-$' + deductions.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-                doc.setTextColor(...navy);
-            }
-            
-            // Divider line
-            y += 10;
-            doc.setDrawColor(229, 231, 235);
-            doc.setLineWidth(0.3);
-            doc.line(margin + 10, y, pageWidth - margin - 10, y);
-            
-            // Balance Due
-            y += 12;
-            doc.setTextColor(...navy);
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('BALANCE DUE', margin + 10, y);
-            doc.setTextColor(...coral);
-            doc.setFontSize(14);
-            doc.text('$' + total.toFixed(2), pageWidth - margin - 10, y, { align: 'right' });
-            
-            // Payment Type
-            y += 12;
-            doc.setTextColor(...coral);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Payment Method: ', margin + 10, y);
-            doc.setTextColor(...gray);
-            doc.setFont('helvetica', 'normal');
-            doc.text(paymentType, margin + 10 + doc.getTextWidth('Payment Method: '), y);
-            
-            // Tax Note box
-            y += 12;
-            doc.setFillColor(255, 251, 248);
-            doc.setDrawColor(255, 200, 180);
-            doc.roundedRect(margin + 10, y, contentWidth - 20, 24, 2, 2, 'FD');
-            
-            y += 8;
-            doc.setTextColor(...navy);
-            doc.setFontSize(8);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Note: ', margin + 15, y);
-            doc.setFont('helvetica', 'normal');
-            const noteText = 'I am solely responsible for the calculation, reporting, and payment of any applicable taxes related to this invoice, in accordance with IRS Form W-8 and the tax laws of my country of residence.';
-            const noteLines = doc.splitTextToSize(noteText, contentWidth - 35);
-            doc.text(noteLines[0], margin + 15 + doc.getTextWidth('Note: '), y);
-            if (noteLines[1]) {
-                y += 5;
-                doc.text(noteLines[1], margin + 15, y);
-            }
-            if (noteLines[2]) {
-                y += 5;
-                doc.text(noteLines[2], margin + 15, y);
-            }
-            
-            // Sales breakdown
-            if (salesDetails.trim()) {
-                y = boxY + boxHeight + 15;
-                doc.setTextColor(...navy);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.text('Sales Breakdown:', margin, y);
-                
-                y += 8;
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(...gray);
-                doc.setFontSize(9);
-                
-                const lines = salesDetails.split('\n').slice(0, 10);
-                lines.forEach(line => {
-                    if (line.trim()) {
-                        doc.text(line.trim(), margin + 5, y);
-                        y += 6;
-                    }
-                });
-            }
-            
-            // Additional Notes
-            if (notes.trim()) {
-                y = salesDetails.trim() ? y + 8 : boxY + boxHeight + 15;
-                doc.setTextColor(...navy);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.text('Additional Notes:', margin, y);
-                
-                y += 8;
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(...gray);
-                doc.setFontSize(9);
-                
-                const noteLines = doc.splitTextToSize(notes, contentWidth);
-                noteLines.slice(0, 5).forEach(line => {
-                    doc.text(line, margin + 5, y);
-                    y += 6;
-                });
-            }
-
-            // Footer
-            const pageHeight = doc.internal.pageSize.getHeight();
-            doc.setTextColor(...lightGray);
-            doc.setFontSize(8);
-            doc.setFont('helvetica', 'normal');
-            doc.text('beycome.com · Contractor Invoice', pageWidth / 2, pageHeight - 12, { align: 'center' });
-
-            // Save PDF
-            const fileName = `Invoice_${invoiceNumber}.pdf`;
-            doc.save(fileName);
-
-            return { agentName, invoiceNumber, total, payPeriod, paymentType, baseSalary, commissions, incentives, bonuses, deductions, salesDetails, notes };
         }
 
         let selectedPdfFile = null;
@@ -1453,9 +1275,7 @@
 
         function handleDrop(event) {
             event.preventDefault();
-            const uploadArea = document.getElementById('uploadArea');
-            uploadArea.style.borderColor = '#e2e8f0';
-            uploadArea.style.background = '#f8fafc';
+            document.getElementById('uploadArea').classList.remove('drag-over');
             const file = event.dataTransfer.files[0];
             if (file && file.type === 'application/pdf') setPdfFile(file);
         }
@@ -1465,8 +1285,9 @@
             document.getElementById('uploadPrompt').style.display = 'none';
             document.getElementById('uploadSelected').style.display = 'block';
             document.getElementById('selectedFileName').textContent = file.name;
-            document.getElementById('uploadArea').style.borderColor = '#6EE7B7';
-            document.getElementById('uploadArea').style.background = '#E8FAF5';
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.remove('drag-over');
+            uploadArea.classList.add('file-ready');
             const btn = document.getElementById('submitPdfBtn');
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -1480,9 +1301,7 @@
 
             const invoiceSummary = document.getElementById('invoiceSummary').textContent;
 
-            // Check file size (max 5MB)
-            const filesize = selectedPdfFile.size / 1024;
-            if (filesize > 5000) {
+            if (selectedPdfFile.size / 1024 > 5000) {
                 showToast('⚠️ File is too large. Please keep it under 5MB.', 'error');
                 btn.disabled = false;
                 btn.textContent = 'Submit Invoice to Beycome';
@@ -1497,28 +1316,23 @@
             formData.append('message', `Invoice submitted by ${selectedContractor.name}.\n\n${invoiceSummary}`);
             formData.append('attachment[]', selectedPdfFile, selectedPdfFile.name);
 
-            // No headers — browser auto-adds correct multipart/form-data boundary
-            fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                body: formData
-            })
-            .then(async (response) => {
-                let json = await response.json();
-                if (response.status == 200) {
-                    document.getElementById('finalInvoiceSummary').textContent = invoiceSummary;
-                    document.getElementById('successStep').classList.remove('active');
-                    document.getElementById('finalSuccessStep').classList.add('active');
-                } else {
+            fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData })
+                .then(async (response) => {
+                    const json = await response.json();
+                    if (response.status === 200) {
+                        document.getElementById('successStep').classList.remove('active');
+                        document.getElementById('finalSuccessStep').classList.add('active');
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Submit Invoice to Beycome';
+                        showToast('⚠️ Submission failed: ' + (json.message || 'Please try again.'), 'error');
+                    }
+                })
+                .catch(() => {
                     btn.disabled = false;
                     btn.textContent = 'Submit Invoice to Beycome';
-                    showToast('⚠️ Submission failed: ' + (json.message || 'Please try again.'), 'error');
-                }
-            })
-            .catch((error) => {
-                btn.disabled = false;
-                btn.textContent = 'Submit Invoice to Beycome';
-                showToast('⚠️ Submission failed. Please check your connection.', 'error');
-            });
+                    showToast('⚠️ Submission failed. Please check your connection.', 'error');
+                });
         }
 
         function showToast(message, type) {
@@ -1535,6 +1349,287 @@
             toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 5000);
+        }
+
+        // Generate PDF - Clean Minimal Beycome Design
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const agentName = selectedContractor.name;
+            const baseSalary = selectedContractor.salary;
+            const paymentType = selectedContractor.payment;
+            const department = selectedContractor.department;
+            const commissions = parseFloat(document.getElementById('commissions').value) || 0;
+            const incentives = parseFloat(document.getElementById('incentives').value) || 0;
+            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
+            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const notes = document.getElementById('notes').value;
+            const invoiceNumber = generateInvoiceNumber(agentName);
+            const payPeriod = getPayPeriod();
+
+            const total = baseSalary + commissions + incentives + overtime - deductions;
+            
+            // Colors
+            const coral = [255, 120, 73];
+            const navy = [21, 35, 48];
+            const gray = [100, 116, 139];
+            const lightGray = [220, 225, 230];
+            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 25;
+            const contentWidth = pageWidth - (margin * 2);
+            
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            
+            // ========== HEADER WITH LOGO ==========
+            let y = 25;
+            
+            // Add Beycome logo image
+            // Logo will be loaded before PDF generation
+            if (window.beycomLogoData) {
+                doc.addImage(window.beycomLogoData, 'PNG', margin, y - 5, 50, 15);
+            } else {
+                // Fallback text if logo not loaded
+                doc.setTextColor(...navy);
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text('beycome', margin, y + 10);
+            }
+            
+            // INVOICE text on right
+            doc.setTextColor(...coral);
+            doc.setFontSize(32);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INVOICE', pageWidth - margin, y + 15, { align: 'right' });
+            
+            // ========== INVOICE META - Two columns ==========
+            y = 55;
+            
+            // Left side - FROM
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('FROM', margin, y);
+            
+            y += 8;
+            doc.setTextColor(...navy);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(agentName, margin, y);
+            
+            y += 6;
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(department, margin, y);
+            
+            y += 5;
+            const firstName = agentName.split(' ')[0].toLowerCase();
+            doc.text(firstName + '@beycome.com', margin, y);
+            
+            // Right side - Invoice details (stacked)
+            let rightY = 55;
+            const rightX = pageWidth - margin;
+            
+            doc.setTextColor(...gray);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INVOICE #', rightX, rightY, { align: 'right' });
+            rightY += 5;
+            doc.setTextColor(...navy);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text(invoiceNumber, rightX, rightY, { align: 'right' });
+            
+            rightY += 12;
+            doc.setTextColor(...gray);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DATE', rightX, rightY, { align: 'right' });
+            rightY += 5;
+            doc.setTextColor(...navy);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(dateStr, rightX, rightY, { align: 'right' });
+            
+            rightY += 12;
+            doc.setTextColor(...gray);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PAY PERIOD', rightX, rightY, { align: 'right' });
+            rightY += 5;
+            doc.setTextColor(...navy);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(payPeriod, rightX, rightY, { align: 'right' });
+            
+            // ========== BILL TO ==========
+            y = 100;
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('BILL TO', margin, y);
+            
+            y += 8;
+            doc.setTextColor(...navy);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Beycome Corp.', margin, y);
+            
+            y += 6;
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('5701 Sunset Drive, #224', margin, y);
+            y += 5;
+            doc.text('South Miami, FL 33143', margin, y);
+            y += 5;
+            doc.text('sam@beycome.com', margin, y);
+            
+            // ========== LINE ITEMS TABLE ==========
+            y = 145;
+            
+            // Table header background
+            doc.setFillColor(248, 250, 252);
+            doc.rect(margin, y - 6, contentWidth, 14, 'F');
+            
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DESCRIPTION', margin + 8, y + 2);
+            doc.text('AMOUNT', pageWidth - margin - 8, y + 2, { align: 'right' });
+            
+            // Line items
+            y += 18;
+            doc.setTextColor(...navy);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            
+            // Base Salary
+            doc.text('Bi-Weekly Base Salary', margin + 8, y);
+            doc.text('$' + baseSalary.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+            
+            y += 5;
+            doc.setDrawColor(...lightGray);
+            doc.setLineWidth(0.3);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 12;
+            
+            if (commissions > 0) {
+                doc.text('Commissions', margin + 8, y);
+                doc.text('$' + commissions.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+                y += 5;
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 12;
+            }
+            
+            if (incentives > 0) {
+                doc.text('Incentives', margin + 8, y);
+                doc.text('$' + incentives.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+                y += 5;
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 12;
+            }
+            
+            if (overtime > 0) {
+                doc.text('Overtime', margin + 8, y);
+                doc.text('$' + overtime.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+                y += 5;
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 12;
+            }
+
+            if (deductions > 0) {
+                doc.setTextColor(220, 53, 69);
+                doc.text('Deductions', margin + 8, y);
+                doc.text('-$' + deductions.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+                y += 5;
+                doc.setDrawColor(...lightGray);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 12;
+                doc.setTextColor(...navy);
+            }
+            
+            // ========== TOTAL BOX ==========
+            y += 5;
+            const totalBoxWidth = 90;
+            const totalBoxX = pageWidth - margin - totalBoxWidth;
+            
+            doc.setFillColor(...coral);
+            doc.roundedRect(totalBoxX, y - 8, totalBoxWidth, 24, 4, 4, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('TOTAL DUE', totalBoxX + 10, y + 4);
+            doc.setFontSize(14);
+            doc.text('$' + total.toFixed(2), pageWidth - margin - 10, y + 4, { align: 'right' });
+            
+            // ========== PAYMENT METHOD ==========
+            y += 30;
+            doc.setTextColor(...gray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PAYMENT METHOD', margin, y);
+            y += 6;
+            doc.setTextColor(...navy);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(paymentType, margin, y);
+            
+            // ========== NOTES (if any) ==========
+            if (notes.trim()) {
+                y += 10;
+                doc.setTextColor(...gray);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('NOTES', margin, y);
+                
+                y += 7;
+                doc.setTextColor(...navy);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                const noteLines = doc.splitTextToSize(notes, contentWidth);
+                noteLines.slice(0, 3).forEach(line => {
+                    doc.text(line, margin, y);
+                    y += 5;
+                });
+            }
+            
+            // ========== FOOTER ==========
+            const footerY = pageHeight - 30;
+            
+            // Separator line
+            doc.setDrawColor(...lightGray);
+            doc.setLineWidth(0.5);
+            doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
+            
+            // Tax notice
+            doc.setTextColor(...gray);
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            const taxNote = 'I acknowledge that I am solely responsible for the calculation, reporting, and payment of any applicable taxes related to this invoice, in accordance with IRS Form W-8 and the tax laws of my country of residence.';
+            const taxLines = doc.splitTextToSize(taxNote, contentWidth);
+            let footerTextY = footerY;
+            taxLines.forEach((line) => {
+                doc.text(line, margin, footerTextY);
+                footerTextY += 4;
+            });
+            
+            // Beycome.com centered at bottom
+            doc.setTextColor(...coral);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('beycome.com', pageWidth / 2, pageHeight - 12, { align: 'center' });
+            
+            // Save
+            const filename = `invoice-${invoiceNumber}.pdf`;
+            doc.save(filename);
+            
+            return { agentName, invoiceNumber, total };
         }
     </script>
 </body>
