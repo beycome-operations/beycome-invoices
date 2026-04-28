@@ -1918,16 +1918,11 @@
             otInput.value = (data.otHours > 0) ? data.otHours : '';
             otInput.setAttribute('readonly', 'readonly');
             if (data.otHours > 0) {
-                document.getElementById('overtime').labels && null; // no-op
-                const otLabel = document.querySelector('label[for-id="overtime"], .form-label');
-                // Find label by proximity - walk up to form-group then find label
                 const otGroup = otInput.closest('.form-group') || otInput.parentElement;
                 const otLabelEl = otGroup ? otGroup.querySelector('label') : null;
                 if (otLabelEl && !otLabelEl.querySelector('.prefilled-badge')) {
                     otLabelEl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
                 }
-            } else {
-                otInput.removeAttribute('readonly');
             }
 
             // --- Deduction ---
