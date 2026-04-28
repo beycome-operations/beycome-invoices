@@ -1877,15 +1877,24 @@
         let payrollData = {}; // pre-filled data loaded from JSONBin on page load
         let adminAuthenticated = false;
 
-        // Load payroll data from JSONBin on page load
+        // Load payroll data from JSONBin with timeout
         async function loadPayrollData() {
             try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 5000);
                 const res = await fetch(JSONBIN_URL + '/latest', {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY },
+                    signal: controller.signal
                 });
+                clearTimeout(timer);
                 if (res.ok) {
                     const json = await res.json();
                     payrollData = json.record || {};
+                    // If employee already logged in, apply pre-fill now
+                    if (selectedContractor) {
+                        applyPrefilledData(selectedContractor.code);
+                        updateTotal();
+                    }
                 }
             } catch(e) {
                 payrollData = {};
