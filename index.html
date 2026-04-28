@@ -1242,7 +1242,7 @@
             }
         });
 
-        async function verifyPassword() {
+        function verifyPassword() {
             const agentIndex = agentSelect.value;
             const enteredCode = document.getElementById('passwordInput').value.toUpperCase();
             const contractor = contractors[agentIndex];
@@ -1261,11 +1261,6 @@
                 document.getElementById('departmentDisplay').textContent = contractor.department;
                 document.getElementById('paymentMethodDisplay').textContent = contractor.payment;
                 document.getElementById('baseSalaryDisplay').textContent = '$' + contractor.salary.toFixed(2);
-
-                // Ensure payroll data is loaded before applying
-                if (Object.keys(payrollData).length === 0) {
-                    await loadPayrollData();
-                }
 
                 applyPrefilledData(contractor.code);
                 updateTotal();
