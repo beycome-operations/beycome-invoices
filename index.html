@@ -778,7 +778,14 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Deductions</label>
-                            <input type="number" id="deductions" class="form-input" placeholder="$0.00" step="0.01" min="0">
+                            <select id="deductionType" class="form-input" style="margin-bottom:0.5rem;">
+                                <option value="">No Deduction</option>
+                                <option value="full">Full Day</option>
+                                <option value="half">Half Day</option>
+                                <option value="hours">Hours Missed</option>
+                            </select>
+                            <input type="number" id="deductionHours" class="form-input" placeholder="How many hours missed?" step="0.5" min="0" style="display:none; margin-top:0.5rem;">
+                            <div id="deductionCalc" style="font-size:0.8rem; color:#DC2626; margin-top:0.35rem; display:none;"></div>
                         </div>
                     </div>
                 </div>
@@ -1125,10 +1132,51 @@
             }
         }
 
-        // Calculate overtime pay: time and a half based on bi-weekly salary (80hrs/period)
+        // Calculate overtime pay: time and a half based on bi-weekly salary (85hrs/period)
         function calcOvertimePay(hours, baseSalary) {
             const hourlyRate = baseSalary / 85;
             return hours * hourlyRate * 1.5;
+        }
+
+        // Calculate deduction amount based on type
+        function calcDeduction(baseSalary) {
+            const type = document.getElementById('deductionType').value;
+            const dailyRate = baseSalary / 10; // 5 days/week × 2 weeks
+            const hourlyRate = baseSalary / 85;
+            const calcEl = document.getElementById('deductionCalc');
+            const hoursInput = document.getElementById('deductionHours');
+
+            if (!type) {
+                calcEl.style.display = 'none';
+                hoursInput.style.display = 'none';
+                return 0;
+            }
+            if (type === 'full') {
+                hoursInput.style.display = 'none';
+                calcEl.style.display = 'block';
+                calcEl.textContent = 'Full day deduction = -$' + dailyRate.toFixed(2);
+                return dailyRate;
+            }
+            if (type === 'half') {
+                hoursInput.style.display = 'none';
+                calcEl.style.display = 'block';
+                calcEl.textContent = 'Half day deduction = -$' + (dailyRate / 2).toFixed(2);
+                return dailyRate / 2;
+            }
+            if (type === 'hours') {
+                hoursInput.style.display = 'block';
+                const missedHours = parseFloat(hoursInput.value) || 0;
+                if (missedHours > 0) {
+                    const amount = missedHours * hourlyRate;
+                    calcEl.style.display = 'block';
+                    calcEl.textContent = missedHours + ' hrs × $' + hourlyRate.toFixed(2) + '/hr = -$' + amount.toFixed(2);
+                    return amount;
+                } else {
+                    calcEl.style.display = 'none';
+                    return 0;
+                }
+            }
+            return 0;
         }
 
         // Update total calculation
@@ -1137,7 +1185,7 @@
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
-            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const deductions = calcDeduction(baseSalary);
 
             const overtimePay = calcOvertimePay(otHours, baseSalary);
 
@@ -1156,9 +1204,11 @@
         }
 
         // Listen for changes on earning fields
-        ['commissions', 'incentives', 'overtime', 'deductions'].forEach(id => {
+        ['commissions', 'incentives', 'overtime'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateTotal);
         });
+        document.getElementById('deductionType').addEventListener('change', updateTotal);
+        document.getElementById('deductionHours').addEventListener('input', updateTotal);
 
         // Form submission - go to confirmation
         document.getElementById('invoiceForm').addEventListener('submit', function(e) {
@@ -1166,12 +1216,23 @@
             showConfirmation();
         });
 
+        function getDeductionLabel() {
+            const type = document.getElementById('deductionType').value;
+            if (type === 'full') return 'Full Day';
+            if (type === 'half') return 'Half Day';
+            if (type === 'hours') {
+                const hrs = parseFloat(document.getElementById('deductionHours').value) || 0;
+                return hrs + ' hrs missed';
+            }
+            return '';
+        }
+
         function showConfirmation() {
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const overtime = calcOvertimePay(otHours, selectedContractor ? selectedContractor.salary : 0);
-            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const deductions = calcDeduction(selectedContractor ? selectedContractor.salary : 0);
             const total = selectedContractor.salary + commissions + incentives + overtime - deductions;
             
             // Update progress bar
@@ -1209,7 +1270,7 @@
 
             if (deductions > 0) {
                 document.getElementById('confirmDeductionsRow').style.display = 'flex';
-                document.getElementById('confirmDeductions').textContent = '-$' + deductions.toFixed(2);
+                document.getElementById('confirmDeductions').textContent = getDeductionLabel() + ' = -$' + deductions.toFixed(2);
             } else {
                 document.getElementById('confirmDeductionsRow').style.display = 'none';
             }
@@ -1381,7 +1442,8 @@
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const overtime = calcOvertimePay(otHours, baseSalary);
-            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const deductions = calcDeduction(baseSalary);
+            const deductionLabel = getDeductionLabel();
             const notes = document.getElementById('notes').value;
             const invoiceNumber = generateInvoiceNumber(agentName);
             const payPeriod = getPayPeriod();
@@ -1562,7 +1624,7 @@
 
             if (deductions > 0) {
                 doc.setTextColor(220, 53, 69);
-                doc.text('Deductions', margin + 8, y);
+                doc.text('Deduction (' + deductionLabel + ')', margin + 8, y);
                 doc.text('-$' + deductions.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
                 y += 5;
                 doc.setDrawColor(...lightGray);
