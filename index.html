@@ -1122,7 +1122,7 @@
                 <div id="adminEmployeeList"></div>
 
                 <div style="margin-top:1.25rem; display:flex; gap:0.75rem;">
-                    <button onclick="savePayrollData()" class="btn-primary show" style="flex:2;" id="adminSaveBtn">Save for This Pay Period</button>
+                    <button onclick="savePayrollData()" class="btn-primary show" style="flex:2;" id="adminSaveBtn">Generate Pay Period Link</button>
                     <button onclick="closeAdmin()" class="btn-secondary" style="flex:1; margin-top:0;">Close</button>
                 </div>
                 <div id="adminSaveStatus" style="margin-top:0.75rem; font-size:0.8rem; text-align:center; display:none;"></div>
@@ -1890,28 +1890,24 @@
         // ADMIN PANEL
         // =============================================
         const ADMIN_CODE = 'BEY@2026';
-        const BLOB_URL = 'https://jsonblob.com/api/jsonBlob/019dd555-c568-7954-a715-99e65023210f';
 
         let payrollData = {};
         let adminAuthenticated = false;
 
-        // Load payroll data from jsonblob
-        async function loadPayrollData() {
+        // Load payroll data from URL hash (e.g. #d=BASE64)
+        function loadPayrollData() {
             try {
-                const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), 5000);
-                const res = await fetch(BLOB_URL, {
-                    headers: { 'Accept': 'application/json' },
-                    signal: controller.signal
-                });
-                clearTimeout(timer);
-                if (res.ok) {
-                    payrollData = await res.json();
+                const hash = window.location.hash;
+                const match = hash.match(/[#&]d=([^&]*)/);
+                if (match) {
+                    payrollData = JSON.parse(atob(decodeURIComponent(match[1])));
                 }
             } catch(e) {
                 payrollData = {};
             }
+            return Promise.resolve();
         }
+        loadPayrollData();
         loadPayrollData();
 
         // Apply pre-filled data after employee verifies
@@ -2029,14 +2025,8 @@
             document.getElementById(`adm_dedHoursRow_${code}`).style.display = type === 'hours' ? 'block' : 'none';
         }
 
-        // Save payroll data instantly to jsonblob
-        async function savePayrollData() {
-            const btn = document.getElementById('adminSaveBtn');
-            const status = document.getElementById('adminSaveStatus');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-            status.style.display = 'none';
-
+        // Generate pay period link with all data encoded in URL hash
+        function savePayrollData() {
             const data = {};
             contractors.forEach(c => {
                 const otHours = parseFloat(document.getElementById(`adm_ot_${c.code}`).value) || 0;
@@ -2045,28 +2035,28 @@
                 data[c.code] = { otHours, dedType, dedHours };
             });
 
-            try {
-                const res = await fetch(BLOB_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (res.ok) {
-                    payrollData = data;
-                    status.style.display = 'block';
-                    status.style.color = '#059669';
-                    status.textContent = '✓ Saved! Employees will see updated data immediately.';
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                status.style.display = 'block';
-                status.style.color = '#DC2626';
-                status.textContent = '⚠️ Save failed. Please try again.';
-            }
+            payrollData = data;
+            const encoded = encodeURIComponent(btoa(JSON.stringify(data)));
+            const link = `https://samodiofl-boop.github.io/beycome-invoices/#d=${encoded}`;
 
-            btn.disabled = false;
-            btn.textContent = 'Save for This Pay Period';
+            const status = document.getElementById('adminSaveStatus');
+            status.style.display = 'block';
+            status.style.color = '#152330';
+            status.innerHTML = `
+                <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:0.75rem; margin-top:0.5rem;">
+                    <div style="font-weight:600; color:#059669; margin-bottom:0.5rem;">✓ Pay Period Link Ready</div>
+                    <div style="font-size:0.72rem; word-break:break-all; color:#334155; background:white; border:1px solid #e2e8f0; border-radius:6px; padding:0.5rem; margin-bottom:0.5rem;">${link}</div>
+                    <button onclick="copyPayLink('${link}')" style="background:#FF7849; color:white; border:none; border-radius:6px; padding:0.4rem 0.9rem; font-size:0.8rem; font-weight:600; cursor:pointer;">Copy Link</button>
+                    <span id="copyConfirm" style="font-size:0.75rem; color:#059669; margin-left:0.5rem; display:none;">Copied!</span>
+                </div>
+                <p style="font-size:0.75rem; color:#64748b; margin-top:0.5rem;">Share this link with the team in Slack. Employees must use this link to see their pre-filled invoice.</p>
+            `;
+        }
+
+        function copyPayLink(link) {
+            navigator.clipboard.writeText(link);
+            document.getElementById('copyConfirm').style.display = 'inline';
+            setTimeout(() => document.getElementById('copyConfirm').style.display = 'none', 2000);
         }
     </script>
 </body>
