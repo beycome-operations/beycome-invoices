@@ -772,8 +772,9 @@
                             <input type="number" id="incentives" class="form-input" placeholder="$0.00" step="0.01" min="0">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Overtime</label>
-                            <input type="number" id="overtime" class="form-input" placeholder="$0.00" step="0.01" min="0">
+                            <label class="form-label">Overtime Hours</label>
+                            <input type="number" id="overtime" class="form-input" placeholder="0 hours" step="0.5" min="0">
+                            <div id="overtimeCalc" style="font-size:0.8rem; color:#FF7849; margin-top:0.35rem; display:none;"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Deductions</label>
@@ -1124,15 +1125,33 @@
             }
         }
 
+        // Calculate overtime pay: time and a half based on bi-weekly salary (80hrs/period)
+        function calcOvertimePay(hours, baseSalary) {
+            const hourlyRate = baseSalary / 85;
+            return hours * hourlyRate * 1.5;
+        }
+
         // Update total calculation
         function updateTotal() {
             const baseSalary = selectedContractor ? selectedContractor.salary : 0;
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
+            const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
 
-            const total = baseSalary + commissions + incentives + overtime - deductions;
+            const overtimePay = calcOvertimePay(otHours, baseSalary);
+
+            // Show OT dollar breakdown under the input
+            const otCalcEl = document.getElementById('overtimeCalc');
+            if (otHours > 0 && baseSalary > 0) {
+                const hourlyRate = baseSalary / 85;
+                otCalcEl.style.display = 'block';
+                otCalcEl.textContent = otHours + ' hrs × $' + hourlyRate.toFixed(2) + '/hr × 1.5 = $' + overtimePay.toFixed(2);
+            } else {
+                otCalcEl.style.display = 'none';
+            }
+
+            const total = baseSalary + commissions + incentives + overtimePay - deductions;
             document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
         }
 
@@ -1150,7 +1169,8 @@
         function showConfirmation() {
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
+            const otHours = parseFloat(document.getElementById('overtime').value) || 0;
+            const overtime = calcOvertimePay(otHours, selectedContractor ? selectedContractor.salary : 0);
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
             const total = selectedContractor.salary + commissions + incentives + overtime - deductions;
             
@@ -1182,7 +1202,7 @@
             
             if (overtime > 0) {
                 document.getElementById('confirmOvertimeRow').style.display = 'flex';
-                document.getElementById('confirmOvertime').textContent = '$' + overtime.toFixed(2);
+                document.getElementById('confirmOvertime').textContent = otHours + ' hrs = $' + overtime.toFixed(2);
             } else {
                 document.getElementById('confirmOvertimeRow').style.display = 'none';
             }
@@ -1359,7 +1379,8 @@
             const department = selectedContractor.department;
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
-            const overtime = parseFloat(document.getElementById('overtime').value) || 0;
+            const otHours = parseFloat(document.getElementById('overtime').value) || 0;
+            const overtime = calcOvertimePay(otHours, baseSalary);
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
             const notes = document.getElementById('notes').value;
             const invoiceNumber = generateInvoiceNumber(agentName);
@@ -1532,7 +1553,7 @@
             }
             
             if (overtime > 0) {
-                doc.text('Overtime', margin + 8, y);
+                doc.text('Overtime (' + otHours + ' hrs @ 1.5x)', margin + 8, y);
                 doc.text('$' + overtime.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
                 y += 5;
                 doc.line(margin, y, pageWidth - margin, y);
