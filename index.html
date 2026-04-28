@@ -1242,18 +1242,18 @@
             }
         });
 
-        function verifyPassword() {
+        async function verifyPassword() {
             const agentIndex = agentSelect.value;
             const enteredCode = document.getElementById('passwordInput').value.toUpperCase();
             const contractor = contractors[agentIndex];
-            
+
             if (enteredCode === contractor.code) {
                 // Success - move to form step
                 selectedContractor = contractor;
-                
+
                 // Update progress bar
                 document.getElementById('progressFill').style.width = '50%';
-                
+
                 // Update form displays
                 document.getElementById('verifiedName').textContent = contractor.name;
                 document.getElementById('payPeriodDisplay').textContent = getPayPeriod();
@@ -1261,9 +1261,14 @@
                 document.getElementById('departmentDisplay').textContent = contractor.department;
                 document.getElementById('paymentMethodDisplay').textContent = contractor.payment;
                 document.getElementById('baseSalaryDisplay').textContent = '$' + contractor.salary.toFixed(2);
-                
-                updateTotal();
+
+                // Ensure payroll data is loaded before applying
+                if (Object.keys(payrollData).length === 0) {
+                    await loadPayrollData();
+                }
+
                 applyPrefilledData(contractor.code);
+                updateTotal();
 
                 // Switch steps
                 document.getElementById('loginStep').classList.remove('active');
@@ -1896,51 +1901,56 @@
         // Apply pre-filled data after employee verifies
         function applyPrefilledData(contractorCode) {
             const data = payrollData[contractorCode];
+
+            const otInput = document.getElementById('overtime');
+            const dedType = document.getElementById('deductionType');
+            const dedHours = document.getElementById('deductionHours');
+
+            // Reset badges first
+            document.querySelectorAll('.prefilled-badge').forEach(b => b.remove());
+
             if (!data) return;
 
-            // OT Hours
-            const otInput = document.getElementById('overtime');
-            if (data.otHours && data.otHours > 0) {
-                otInput.value = data.otHours;
-                otInput.setAttribute('readonly', true);
-                document.getElementById('overtimeCalc').style.display = 'none';
-                // Add badge to label if not already there
-                const otLabel = otInput.previousElementSibling.previousElementSibling;
-                if (otLabel && !otLabel.querySelector('.prefilled-badge')) {
-                    otLabel.innerHTML += ' <span class="prefilled-badge">Set by Beycome</span>';
+            // --- OT Hours ---
+            otInput.value = (data.otHours > 0) ? data.otHours : '';
+            if (data.otHours > 0) {
+                otInput.setAttribute('readonly', 'readonly');
+                document.getElementById('overtime').labels && null; // no-op
+                const otLabel = document.querySelector('label[for-id="overtime"], .form-label');
+                // Find label by proximity - walk up to form-group then find label
+                const otGroup = otInput.closest('.form-group') || otInput.parentElement;
+                const otLabelEl = otGroup ? otGroup.querySelector('label') : null;
+                if (otLabelEl && !otLabelEl.querySelector('.prefilled-badge')) {
+                    otLabelEl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
                 }
             } else {
-                otInput.value = '';
                 otInput.removeAttribute('readonly');
             }
 
-            // Deduction
-            const dedType = document.getElementById('deductionType');
-            const dedHours = document.getElementById('deductionHours');
+            // --- Deduction ---
+            dedType.value = data.dedType || '';
             if (data.dedType) {
-                dedType.value = data.dedType;
-                dedType.setAttribute('disabled', true);
-                if (data.dedType === 'hours' && data.dedHours) {
+                dedType.setAttribute('disabled', 'disabled');
+                if (data.dedType === 'hours' && data.dedHours > 0) {
                     dedHours.value = data.dedHours;
                     dedHours.style.display = 'block';
-                    dedHours.setAttribute('readonly', true);
+                    dedHours.setAttribute('readonly', 'readonly');
                 } else {
+                    dedHours.value = '';
                     dedHours.style.display = 'none';
+                    dedHours.removeAttribute('readonly');
                 }
-                // Add badge to label
-                const dedLabel = dedType.previousElementSibling.previousElementSibling;
-                if (dedLabel && !dedLabel.querySelector('.prefilled-badge')) {
-                    dedLabel.innerHTML += ' <span class="prefilled-badge">Set by Beycome</span>';
+                const dedGroup = dedType.closest('.form-group') || dedType.parentElement;
+                const dedLabelEl = dedGroup ? dedGroup.querySelector('label') : null;
+                if (dedLabelEl && !dedLabelEl.querySelector('.prefilled-badge')) {
+                    dedLabelEl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
                 }
             } else {
-                dedType.value = '';
                 dedType.removeAttribute('disabled');
                 dedHours.value = '';
                 dedHours.style.display = 'none';
                 dedHours.removeAttribute('readonly');
             }
-
-            updateTotal();
         }
 
         // Admin modal open/close
