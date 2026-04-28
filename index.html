@@ -1914,9 +1914,10 @@
             if (!data) return;
 
             // --- OT Hours ---
+            otInput.removeAttribute('readonly');
             otInput.value = (data.otHours > 0) ? data.otHours : '';
+            otInput.setAttribute('readonly', 'readonly');
             if (data.otHours > 0) {
-                otInput.setAttribute('readonly', 'readonly');
                 document.getElementById('overtime').labels && null; // no-op
                 const otLabel = document.querySelector('label[for-id="overtime"], .form-label');
                 // Find label by proximity - walk up to form-group then find label
@@ -1930,17 +1931,18 @@
             }
 
             // --- Deduction ---
+            // Temporarily enable so we can set the value, then re-disable
+            dedType.removeAttribute('disabled');
             dedType.value = data.dedType || '';
+            dedType.setAttribute('disabled', 'disabled');
+
             if (data.dedType) {
-                dedType.setAttribute('disabled', 'disabled');
                 if (data.dedType === 'hours' && data.dedHours > 0) {
                     dedHours.value = data.dedHours;
                     dedHours.style.display = 'block';
-                    dedHours.setAttribute('readonly', 'readonly');
                 } else {
                     dedHours.value = '';
                     dedHours.style.display = 'none';
-                    dedHours.removeAttribute('readonly');
                 }
                 const dedGroup = dedType.closest('.form-group') || dedType.parentElement;
                 const dedLabelEl = dedGroup ? dedGroup.querySelector('label') : null;
@@ -1948,10 +1950,8 @@
                     dedLabelEl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
                 }
             } else {
-                dedType.removeAttribute('disabled');
                 dedHours.value = '';
                 dedHours.style.display = 'none';
-                dedHours.removeAttribute('readonly');
             }
         }
 
