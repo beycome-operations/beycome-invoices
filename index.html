@@ -1245,10 +1245,19 @@
             const enteredCode = document.getElementById('passwordInput').value.toUpperCase();
             const contractor = contractors[agentIndex];
 
-            if (enteredCode === contractor.code) {
-                // Success - move to form step
-                selectedContractor = contractor;
+            if (enteredCode !== contractor.code) {
+                document.getElementById('passwordInput').classList.add('error');
+                document.getElementById('errorMessage').classList.add('show');
+                return;
+            }
 
+            // Correct code — show loading state while fetching payroll data
+            selectedContractor = contractor;
+            const verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Loading...';
+
+            loadPayrollData().then(() => {
                 // Update progress bar
                 document.getElementById('progressFill').style.width = '50%';
 
@@ -1266,11 +1275,24 @@
                 // Switch steps
                 document.getElementById('loginStep').classList.remove('active');
                 document.getElementById('formStep').classList.add('active');
-            } else {
-                // Error
-                document.getElementById('passwordInput').classList.add('error');
-                document.getElementById('errorMessage').classList.add('show');
-            }
+
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify';
+            }).catch(() => {
+                // If fetch fails still proceed without pre-fill
+                document.getElementById('progressFill').style.width = '50%';
+                document.getElementById('verifiedName').textContent = contractor.name;
+                document.getElementById('payPeriodDisplay').textContent = getPayPeriod();
+                document.getElementById('invoiceNumberDisplay').textContent = generateInvoiceNumber(contractor.name);
+                document.getElementById('departmentDisplay').textContent = contractor.department;
+                document.getElementById('paymentMethodDisplay').textContent = contractor.payment;
+                document.getElementById('baseSalaryDisplay').textContent = '$' + contractor.salary.toFixed(2);
+                updateTotal();
+                document.getElementById('loginStep').classList.remove('active');
+                document.getElementById('formStep').classList.add('active');
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify';
+            });
         }
 
         // Calculate overtime pay: time and a half based on bi-weekly salary (85hrs/period)
@@ -1888,11 +1910,6 @@
                 if (res.ok) {
                     const json = await res.json();
                     payrollData = json.record || {};
-                    // If employee already logged in, apply pre-fill now
-                    if (selectedContractor) {
-                        applyPrefilledData(selectedContractor.code);
-                        updateTotal();
-                    }
                 }
             } catch(e) {
                 payrollData = {};
