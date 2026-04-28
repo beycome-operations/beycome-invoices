@@ -873,18 +873,18 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Overtime Hours</label>
-                            <input type="number" id="overtime" class="form-input" placeholder="0 hours" step="0.5" min="0">
+                            <input type="number" id="overtime" class="form-input" placeholder="0 hours" step="0.5" min="0" readonly>
                             <div id="overtimeCalc" style="font-size:0.8rem; color:#FF7849; margin-top:0.35rem; display:none;"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Deductions</label>
-                            <select id="deductionType" class="form-input" style="margin-bottom:0.5rem;">
+                            <select id="deductionType" class="form-input" style="margin-bottom:0.5rem;" disabled>
                                 <option value="">No Deduction</option>
                                 <option value="full">Full Day</option>
                                 <option value="half">Half Day</option>
                                 <option value="hours">Hours Missed</option>
                             </select>
-                            <input type="number" id="deductionHours" class="form-input" placeholder="How many hours missed?" step="0.5" min="0" style="display:none; margin-top:0.5rem;">
+                            <input type="number" id="deductionHours" class="form-input" placeholder="How many hours missed?" step="0.5" min="0" style="display:none; margin-top:0.5rem;" readonly>
                             <div id="deductionCalc" style="font-size:0.8rem; color:#DC2626; margin-top:0.35rem; display:none;"></div>
                         </div>
                     </div>
