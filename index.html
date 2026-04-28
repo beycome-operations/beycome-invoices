@@ -1890,26 +1890,20 @@
         // ADMIN PANEL
         // =============================================
         const ADMIN_CODE = 'BEY@2026';
-        const JSONBIN_API_KEY = '$2a$10$/rh59fvlOIKDU0XjX5Adb.u2HxymySJFjFObU0Yjoj8HnwVGqv2RK';
-        const JSONBIN_BIN_ID = '69f0cca5856a68218981e502';
-        const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+        const PAYROLL_URL = 'https://raw.githubusercontent.com/samodiofl-boop/beycome-invoices/main/payroll.json';
 
-        let payrollData = {}; // pre-filled data loaded from JSONBin on page load
+        let payrollData = {};
         let adminAuthenticated = false;
 
-        // Load payroll data from JSONBin
+        // Load payroll data from repo
         async function loadPayrollData() {
             try {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), 5000);
-                const res = await fetch(JSONBIN_URL + '/latest', {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY },
-                    signal: controller.signal
-                });
+                const res = await fetch(PAYROLL_URL + '?t=' + Date.now(), { signal: controller.signal });
                 clearTimeout(timer);
                 if (res.ok) {
-                    const json = await res.json();
-                    payrollData = json.record || {};
+                    payrollData = await res.json();
                 }
             } catch(e) {
                 payrollData = {};
@@ -2032,13 +2026,10 @@
             document.getElementById(`adm_dedHoursRow_${code}`).style.display = type === 'hours' ? 'block' : 'none';
         }
 
-        // Save payroll data to JSONBin
-        async function savePayrollData() {
+        // Save payroll data — downloads payroll.json for Sam to commit
+        function savePayrollData() {
             const btn = document.getElementById('adminSaveBtn');
             const status = document.getElementById('adminSaveStatus');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-            status.style.display = 'none';
 
             const data = {};
             contractors.forEach(c => {
@@ -2048,31 +2039,19 @@
                 data[c.code] = { otHours, dedType, dedHours };
             });
 
-            try {
-                // Save payroll data
-                const res = await fetch(JSONBIN_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify(data)
-                });
-                if (res.ok) {
-                    payrollData = data;
-                    status.style.display = 'block';
-                    status.style.color = '#059669';
-                    status.textContent = '✓ Saved! Employees will see pre-filled data when they open the invoice.';
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                status.style.display = 'block';
-                status.style.color = '#DC2626';
-                status.textContent = '⚠️ Save failed. Check your JSONBin API key and Bin ID.';
-            }
+            // Download payroll.json
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'payroll.json';
+            a.click();
+            URL.revokeObjectURL(url);
 
-            btn.disabled = false;
+            payrollData = data;
+            status.style.display = 'block';
+            status.style.color = '#059669';
+            status.textContent = '✓ payroll.json downloaded! Drop it in the beycome-invoices folder and push to GitHub.';
             btn.textContent = 'Save for This Pay Period';
         }
     </script>

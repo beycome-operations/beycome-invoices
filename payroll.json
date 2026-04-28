@@ -1,0 +1,18 @@
+{
+  "KEV4821": {"otHours": 0, "dedType": "hours", "dedHours": 14},
+  "ROS7392": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "OMR5147": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "MAR8264": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "KSH3958": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "IST2849": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "MAR9156": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "CHR4738": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "KEN5827": {"otHours": 0, "dedType": "hours", "dedHours": 10},
+  "MAR3649": {"otHours": 0, "dedType": "hours", "dedHours": 7},
+  "WAR8472": {"otHours": 4, "dedType": "", "dedHours": 0},
+  "GIE2958": {"otHours": 18.5, "dedType": "", "dedHours": 0},
+  "KAR7361": {"otHours": 8.5, "dedType": "", "dedHours": 0},
+  "MIC4829": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "LIN6284": {"otHours": 35, "dedType": "", "dedHours": 0},
+  "ALV3947": {"otHours": 14, "dedType": "", "dedHours": 0}
+}
