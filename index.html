@@ -1897,12 +1897,13 @@
         let payrollData = {}; // pre-filled data loaded from JSONBin on page load
         let adminAuthenticated = false;
 
-        // Load payroll data from JSONBin (public bin — no auth needed for reads)
+        // Load payroll data from JSONBin
         async function loadPayrollData() {
             try {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), 5000);
                 const res = await fetch(JSONBIN_URL + '/latest', {
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY },
                     signal: controller.signal
                 });
                 clearTimeout(timer);
@@ -2048,16 +2049,6 @@
             });
 
             try {
-                // Make bin public so employees can read without auth
-                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/settings`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify({ private: false })
-                });
-
                 // Save payroll data
                 const res = await fetch(JSONBIN_URL, {
                     method: 'PUT',
