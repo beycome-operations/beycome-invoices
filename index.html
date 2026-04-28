@@ -646,6 +646,106 @@
             flex: 2;
         }
 
+        /* Admin modal */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+        }
+        .admin-modal-inner {
+            max-width: 620px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .admin-employee-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .admin-employee-name {
+            font-weight: 600;
+            color: #152330;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .admin-employee-dept {
+            font-weight: 400;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+        .admin-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .admin-field-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .admin-small-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: #152330;
+        }
+        .admin-small-input:focus {
+            outline: none;
+            border-color: #FF7849;
+        }
+        .generated-link-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            word-break: break-all;
+            font-size: 0.75rem;
+            color: #152330;
+            margin-top: 0.75rem;
+            display: none;
+        }
+        /* Prefilled badge on form */
+        .prefilled-badge {
+            display: inline-block;
+            background: #FFF4F0;
+            border: 1px solid #FF7849;
+            color: #FF7849;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        .form-input[readonly] {
+            background: #f8fafc;
+            color: #64748b;
+            cursor: not-allowed;
+            border-color: #e2e8f0;
+        }
+        .admin-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.7rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .admin-link:hover { color: #94a3b8; }
+
         @media (max-width: 480px) {
             body {
                 padding: 1rem;
@@ -992,6 +1092,46 @@
         </div>
     </div>
 
+    <!-- Admin link -->
+    <a class="admin-link" onclick="openAdmin()">⚙ Admin</a>
+
+    <!-- Admin Modal -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-modal-inner">
+
+            <!-- Admin Login -->
+            <div id="adminLogin">
+                <h2 style="font-size:1.25rem; font-weight:700; color:#152330; margin-bottom:0.4rem;">Admin Panel</h2>
+                <p style="font-size:0.875rem; color:#64748b; margin-bottom:1.25rem;">Enter your admin password to continue.</p>
+                <input type="password" id="adminPasswordInput" class="admin-small-input" placeholder="Admin password" style="margin-bottom:0.75rem; width:100%;">
+                <div id="adminLoginError" style="color:#DC2626; font-size:0.8rem; margin-bottom:0.75rem; display:none;">Incorrect password. Try again.</div>
+                <div style="display:flex; gap:0.75rem;">
+                    <button onclick="verifyAdmin()" class="btn-primary show" style="flex:2;">Enter</button>
+                    <button onclick="closeAdmin()" class="btn-secondary" style="flex:1; margin-top:0;">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                    <div>
+                        <h2 style="font-size:1.25rem; font-weight:700; color:#152330; margin-bottom:0.15rem;">Payroll Setup</h2>
+                        <p style="font-size:0.8rem; color:#64748b;">Set OT hours & deductions for each employee.</p>
+                    </div>
+                    <button onclick="closeAdmin()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.4rem; line-height:1;">✕</button>
+                </div>
+
+                <div id="adminEmployeeList"></div>
+
+                <div style="margin-top:1.25rem; display:flex; gap:0.75rem;">
+                    <button onclick="savePayrollData()" class="btn-primary show" style="flex:2;" id="adminSaveBtn">Save for This Pay Period</button>
+                    <button onclick="closeAdmin()" class="btn-secondary" style="flex:1; margin-top:0;">Close</button>
+                </div>
+                <div id="adminSaveStatus" style="margin-top:0.75rem; font-size:0.8rem; text-align:center; display:none;"></div>
+            </div>
+
+        </div>
+    </div>
 
     <script>
         // Preload Beycome logo for PDF
@@ -1123,7 +1263,8 @@
                 document.getElementById('baseSalaryDisplay').textContent = '$' + contractor.salary.toFixed(2);
                 
                 updateTotal();
-                
+                applyPrefilledData(contractor.code);
+
                 // Switch steps
                 document.getElementById('loginStep').classList.remove('active');
                 document.getElementById('formStep').classList.add('active');
@@ -1723,6 +1864,191 @@
             const blob = doc.output('blob');
 
             return { agentName, invoiceNumber, total, blob, filename };
+        }
+
+        // =============================================
+        // ADMIN PANEL
+        // =============================================
+        const ADMIN_CODE = 'BEY@2026';
+        const JSONBIN_API_KEY = '$2a$10$PLACEHOLDER_REPLACE_ME';
+        const JSONBIN_BIN_ID = 'PLACEHOLDER_REPLACE_ME';
+        const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+        let payrollData = {}; // pre-filled data loaded from JSONBin on page load
+        let adminAuthenticated = false;
+
+        // Load payroll data from JSONBin on page load
+        async function loadPayrollData() {
+            try {
+                const res = await fetch(JSONBIN_URL + '/latest', {
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    payrollData = json.record || {};
+                }
+            } catch(e) {
+                payrollData = {};
+            }
+        }
+        loadPayrollData();
+
+        // Apply pre-filled data after employee verifies
+        function applyPrefilledData(contractorCode) {
+            const data = payrollData[contractorCode];
+            if (!data) return;
+
+            // OT Hours
+            const otInput = document.getElementById('overtime');
+            if (data.otHours && data.otHours > 0) {
+                otInput.value = data.otHours;
+                otInput.setAttribute('readonly', true);
+                document.getElementById('overtimeCalc').style.display = 'none';
+                // Add badge to label if not already there
+                const otLabel = otInput.previousElementSibling.previousElementSibling;
+                if (otLabel && !otLabel.querySelector('.prefilled-badge')) {
+                    otLabel.innerHTML += ' <span class="prefilled-badge">Set by Beycome</span>';
+                }
+            } else {
+                otInput.value = '';
+                otInput.removeAttribute('readonly');
+            }
+
+            // Deduction
+            const dedType = document.getElementById('deductionType');
+            const dedHours = document.getElementById('deductionHours');
+            if (data.dedType) {
+                dedType.value = data.dedType;
+                dedType.setAttribute('disabled', true);
+                if (data.dedType === 'hours' && data.dedHours) {
+                    dedHours.value = data.dedHours;
+                    dedHours.style.display = 'block';
+                    dedHours.setAttribute('readonly', true);
+                } else {
+                    dedHours.style.display = 'none';
+                }
+                // Add badge to label
+                const dedLabel = dedType.previousElementSibling.previousElementSibling;
+                if (dedLabel && !dedLabel.querySelector('.prefilled-badge')) {
+                    dedLabel.innerHTML += ' <span class="prefilled-badge">Set by Beycome</span>';
+                }
+            } else {
+                dedType.value = '';
+                dedType.removeAttribute('disabled');
+                dedHours.value = '';
+                dedHours.style.display = 'none';
+                dedHours.removeAttribute('readonly');
+            }
+
+            updateTotal();
+        }
+
+        // Admin modal open/close
+        function openAdmin() {
+            document.getElementById('adminModal').style.display = 'block';
+            document.getElementById('adminLogin').style.display = adminAuthenticated ? 'none' : 'block';
+            document.getElementById('adminPanel').style.display = adminAuthenticated ? 'block' : 'none';
+            if (adminAuthenticated) renderAdminEmployeeList();
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminLoginError').style.display = 'none';
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function verifyAdmin() {
+            const entered = document.getElementById('adminPasswordInput').value;
+            if (entered === ADMIN_CODE) {
+                adminAuthenticated = true;
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                renderAdminEmployeeList();
+            } else {
+                document.getElementById('adminLoginError').style.display = 'block';
+            }
+        }
+        document.getElementById('adminPasswordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyAdmin();
+        });
+
+        // Render employee list in admin panel
+        function renderAdminEmployeeList() {
+            const container = document.getElementById('adminEmployeeList');
+            container.innerHTML = contractors.map(c => {
+                const existing = payrollData[c.code] || {};
+                return `
+                <div class="admin-employee-card">
+                    <div class="admin-employee-name">${c.name} <span class="admin-employee-dept">· ${c.department}</span></div>
+                    <div class="admin-fields">
+                        <div>
+                            <label class="admin-field-label">OT Hours</label>
+                            <input type="number" id="adm_ot_${c.code}" class="admin-small-input" placeholder="0" step="0.5" min="0" value="${existing.otHours || ''}">
+                        </div>
+                        <div>
+                            <label class="admin-field-label">Deduction</label>
+                            <select id="adm_ded_${c.code}" class="admin-small-input" onchange="toggleAdminDedHours('${c.code}')">
+                                <option value="">None</option>
+                                <option value="full" ${existing.dedType==='full'?'selected':''}>Full Day</option>
+                                <option value="half" ${existing.dedType==='half'?'selected':''}>Half Day</option>
+                                <option value="hours" ${existing.dedType==='hours'?'selected':''}>Hours Missed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="adm_dedHoursRow_${c.code}" style="margin-top:0.5rem; display:${existing.dedType==='hours'?'block':'none'};">
+                        <label class="admin-field-label">Hours Missed</label>
+                        <input type="number" id="adm_dedH_${c.code}" class="admin-small-input" placeholder="0" step="0.5" min="0" value="${existing.dedHours || ''}">
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleAdminDedHours(code) {
+            const type = document.getElementById(`adm_ded_${code}`).value;
+            document.getElementById(`adm_dedHoursRow_${code}`).style.display = type === 'hours' ? 'block' : 'none';
+        }
+
+        // Save payroll data to JSONBin
+        async function savePayrollData() {
+            const btn = document.getElementById('adminSaveBtn');
+            const status = document.getElementById('adminSaveStatus');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            status.style.display = 'none';
+
+            const data = {};
+            contractors.forEach(c => {
+                const otHours = parseFloat(document.getElementById(`adm_ot_${c.code}`).value) || 0;
+                const dedType = document.getElementById(`adm_ded_${c.code}`).value;
+                const dedHours = dedType === 'hours' ? (parseFloat(document.getElementById(`adm_dedH_${c.code}`).value) || 0) : 0;
+                data[c.code] = { otHours, dedType, dedHours };
+            });
+
+            try {
+                const res = await fetch(JSONBIN_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    payrollData = data;
+                    status.style.display = 'block';
+                    status.style.color = '#059669';
+                    status.textContent = '✓ Saved! Employees will see pre-filled data when they open the invoice.';
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                status.style.display = 'block';
+                status.style.color = '#DC2626';
+                status.textContent = '⚠️ Save failed. Check your JSONBin API key and Bin ID.';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Save for This Pay Period';
         }
     </script>
 </body>
