@@ -1181,19 +1181,9 @@
             agentSelect.appendChild(option);
         });
 
-        // Calculate pay period based on current date
+        // Pay period
         function getPayPeriod() {
-            const today = new Date();
-            const day = today.getDate();
-            const month = today.toLocaleString('en-US', { month: 'short' });
-            const year = today.getFullYear();
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-            
-            if (day <= 15) {
-                return `${month} 1 - ${month} 15, ${year}`;
-            } else {
-                return `${month} 16 - ${month} ${lastDay}, ${year}`;
-            }
+            return 'Apr 27 - May 10, 2026';
         }
 
         // Get pay period code for invoice number
