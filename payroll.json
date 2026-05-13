@@ -14,5 +14,7 @@
   "KAR7361": {"otHours": 8.5, "dedType": "", "dedHours": 0},
   "MIC4829": {"otHours": 0, "dedType": "", "dedHours": 0},
   "LIN6284": {"otHours": 35, "dedType": "", "dedHours": 0},
-  "ALV3947": {"otHours": 14, "dedType": "", "dedHours": 0}
+  "ALV3947": {"otHours": 14, "dedType": "", "dedHours": 0},
+  "BRI6241": {"otHours": 0, "dedType": "", "dedHours": 0},
+  "LAB7832": {"otHours": 0, "dedType": "", "dedHours": 0}
 }
