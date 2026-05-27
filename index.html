@@ -2111,6 +2111,7 @@
 
             payrollData = data;
             const encoded = encodeURIComponent(btoa(JSON.stringify(data)));
+            history.replaceState(null, '', '#d=' + encoded);
             const link = `https://samodiofl-boop.github.io/beycome-invoices/#d=${encoded}`;
 
             const status = document.getElementById('adminSaveStatus');
