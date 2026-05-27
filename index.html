@@ -872,6 +872,10 @@
                             <input type="number" id="incentives" class="form-input" placeholder="$0.00" step="0.01" min="0">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Bonuses</label>
+                            <input type="number" id="bonuses" class="form-input" placeholder="$0.00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Overtime Hours</label>
                             <input type="number" id="overtime" class="form-input" placeholder="0 hours" step="0.5" min="0" readonly>
                             <div id="overtimeCalc" style="font-size:0.8rem; color:#FF7849; margin-top:0.35rem; display:none;"></div>
@@ -969,6 +973,10 @@
                     <div class="confirm-row" id="confirmIncentivesRow" style="display: none;">
                         <span class="confirm-label">Incentives</span>
                         <span class="confirm-value" id="confirmIncentives">-</span>
+                    </div>
+                    <div class="confirm-row" id="confirmBonusesRow" style="display: none;">
+                        <span class="confirm-label">Bonuses</span>
+                        <span class="confirm-value" id="confirmBonuses">-</span>
                     </div>
                     <div class="confirm-row" id="confirmOvertimeRow" style="display: none;">
                         <span class="confirm-label">Overtime</span>
@@ -1165,7 +1173,9 @@
             { name: "Lindy Linaza", salary: 500, payment: "PayPal", department: "Data Entry", code: "LIN6284" },
             { name: "Alvaro Torres", salary: 525, payment: "Wire", department: "Data Entry", code: "ALV3947" },
             { name: "Bridget Rama", salary: 475, payment: "PayPal", department: "MLS", code: "BRI6241" },
-            { name: "Label Mamasapano", salary: 300, payment: "PayPal", department: "MLS", code: "LAB7832" }
+            { name: "Label Mamasapano", salary: 300, payment: "PayPal", department: "MLS", code: "LAB7832" },
+            { name: "Metchelyn Diaz", salary: 550, payment: "PayPal", department: "Buyer Program", code: "MET3726" },
+            { name: "Princess Gupita", salary: 300, payment: "PayPal", department: "Data Entry", code: "PRI5049" }
         ];
 
         // Current state
@@ -1339,6 +1349,7 @@
             const baseSalary = selectedContractor ? selectedContractor.salary : 0;
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
+            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const deductions = calcDeduction(baseSalary);
 
@@ -1354,12 +1365,12 @@
                 otCalcEl.style.display = 'none';
             }
 
-            const total = baseSalary + commissions + incentives + overtimePay - deductions;
+            const total = baseSalary + commissions + incentives + bonuses + overtimePay - deductions;
             document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
         }
 
         // Listen for changes on earning fields
-        ['commissions', 'incentives', 'overtime'].forEach(id => {
+        ['commissions', 'incentives', 'bonuses', 'overtime'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateTotal);
         });
         document.getElementById('deductionType').addEventListener('change', updateTotal);
@@ -1385,10 +1396,11 @@
         function showConfirmation() {
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
+            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const overtime = calcOvertimePay(otHours, selectedContractor ? selectedContractor.salary : 0);
             const deductions = calcDeduction(selectedContractor ? selectedContractor.salary : 0);
-            const total = selectedContractor.salary + commissions + incentives + overtime - deductions;
+            const total = selectedContractor.salary + commissions + incentives + bonuses + overtime - deductions;
             
             // Update progress bar
             document.getElementById('progressFill').style.width = '75%';
@@ -1415,7 +1427,14 @@
             } else {
                 document.getElementById('confirmIncentivesRow').style.display = 'none';
             }
-            
+
+            if (bonuses > 0) {
+                document.getElementById('confirmBonusesRow').style.display = 'flex';
+                document.getElementById('confirmBonuses').textContent = '$' + bonuses.toFixed(2);
+            } else {
+                document.getElementById('confirmBonusesRow').style.display = 'none';
+            }
+
             if (overtime > 0) {
                 document.getElementById('confirmOvertimeRow').style.display = 'flex';
                 document.getElementById('confirmOvertime').textContent = otHours + ' hrs = $' + overtime.toFixed(2);
@@ -1605,6 +1624,7 @@
             const department = selectedContractor.department;
             const commissions = parseFloat(document.getElementById('commissions').value) || 0;
             const incentives = parseFloat(document.getElementById('incentives').value) || 0;
+            const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
             const otHours = parseFloat(document.getElementById('overtime').value) || 0;
             const overtime = calcOvertimePay(otHours, baseSalary);
             const deductions = calcDeduction(baseSalary);
@@ -1613,7 +1633,7 @@
             const invoiceNumber = generateInvoiceNumber(agentName);
             const payPeriod = getPayPeriod();
 
-            const total = baseSalary + commissions + incentives + overtime - deductions;
+            const total = baseSalary + commissions + incentives + bonuses + overtime - deductions;
             
             // Colors
             const coral = [255, 120, 73];
@@ -1778,7 +1798,15 @@
                 doc.line(margin, y, pageWidth - margin, y);
                 y += 12;
             }
-            
+
+            if (bonuses > 0) {
+                doc.text('Bonuses', margin + 8, y);
+                doc.text('$' + bonuses.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
+                y += 5;
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 12;
+            }
+
             if (overtime > 0) {
                 doc.text('Overtime (' + otHours + ' hrs @ 1.5x)', margin + 8, y);
                 doc.text('$' + overtime.toFixed(2), pageWidth - margin - 8, y, { align: 'right' });
@@ -1909,9 +1937,16 @@
             const otInput = document.getElementById('overtime');
             const dedType = document.getElementById('deductionType');
             const dedHours = document.getElementById('deductionHours');
+            const commissionsInput = document.getElementById('commissions');
+            const incentivesInput = document.getElementById('incentives');
+            const bonusesInput = document.getElementById('bonuses');
 
-            // Reset badges first
+            // Reset badges and readonly state
             document.querySelectorAll('.prefilled-badge').forEach(b => b.remove());
+            [commissionsInput, incentivesInput, bonusesInput].forEach(el => {
+                el.removeAttribute('readonly');
+                el.value = '';
+            });
 
             if (!data) return;
 
@@ -1928,7 +1963,6 @@
             }
 
             // --- Deduction ---
-            // Temporarily enable so we can set the value, then re-disable
             dedType.removeAttribute('disabled');
             dedType.value = data.dedType || '';
             dedType.setAttribute('disabled', 'disabled');
@@ -1949,6 +1983,39 @@
             } else {
                 dedHours.value = '';
                 dedHours.style.display = 'none';
+            }
+
+            // --- Commissions ---
+            if (data.commissions > 0) {
+                commissionsInput.value = data.commissions;
+                commissionsInput.setAttribute('readonly', 'readonly');
+                const grp = commissionsInput.closest('.form-group');
+                const lbl = grp ? grp.querySelector('label') : null;
+                if (lbl && !lbl.querySelector('.prefilled-badge')) {
+                    lbl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
+                }
+            }
+
+            // --- Incentives ---
+            if (data.incentives > 0) {
+                incentivesInput.value = data.incentives;
+                incentivesInput.setAttribute('readonly', 'readonly');
+                const grp = incentivesInput.closest('.form-group');
+                const lbl = grp ? grp.querySelector('label') : null;
+                if (lbl && !lbl.querySelector('.prefilled-badge')) {
+                    lbl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
+                }
+            }
+
+            // --- Bonuses ---
+            if (data.bonuses > 0) {
+                bonusesInput.value = data.bonuses;
+                bonusesInput.setAttribute('readonly', 'readonly');
+                const grp = bonusesInput.closest('.form-group');
+                const lbl = grp ? grp.querySelector('label') : null;
+                if (lbl && !lbl.querySelector('.prefilled-badge')) {
+                    lbl.insertAdjacentHTML('beforeend', ' <span class="prefilled-badge">Set by Beycome</span>');
+                }
             }
         }
 
@@ -2003,6 +2070,18 @@
                                 <option value="hours" ${existing.dedType==='hours'?'selected':''}>Hours Missed</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="admin-field-label">Commissions ($)</label>
+                            <input type="number" id="adm_com_${c.code}" class="admin-small-input" placeholder="0" step="0.01" min="0" value="${existing.commissions || ''}">
+                        </div>
+                        <div>
+                            <label class="admin-field-label">Incentives ($)</label>
+                            <input type="number" id="adm_inc_${c.code}" class="admin-small-input" placeholder="0" step="0.01" min="0" value="${existing.incentives || ''}">
+                        </div>
+                        <div>
+                            <label class="admin-field-label">Bonuses ($)</label>
+                            <input type="number" id="adm_bon_${c.code}" class="admin-small-input" placeholder="0" step="0.01" min="0" value="${existing.bonuses || ''}">
+                        </div>
                     </div>
                     <div id="adm_dedHoursRow_${c.code}" style="margin-top:0.5rem; display:${existing.dedType==='hours'?'block':'none'};">
                         <label class="admin-field-label">Hours Missed</label>
@@ -2024,7 +2103,10 @@
                 const otHours = parseFloat(document.getElementById(`adm_ot_${c.code}`).value) || 0;
                 const dedType = document.getElementById(`adm_ded_${c.code}`).value;
                 const dedHours = dedType === 'hours' ? (parseFloat(document.getElementById(`adm_dedH_${c.code}`).value) || 0) : 0;
-                data[c.code] = { otHours, dedType, dedHours };
+                const commissions = parseFloat(document.getElementById(`adm_com_${c.code}`).value) || 0;
+                const incentives = parseFloat(document.getElementById(`adm_inc_${c.code}`).value) || 0;
+                const bonuses = parseFloat(document.getElementById(`adm_bon_${c.code}`).value) || 0;
+                data[c.code] = { otHours, dedType, dedHours, commissions, incentives, bonuses };
             });
 
             payrollData = data;
