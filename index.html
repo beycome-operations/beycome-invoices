@@ -1917,7 +1917,10 @@
                 const hash = window.location.hash;
                 const match = hash.match(/[#&]d=([^&]*)/);
                 if (match) {
-                    payrollData = JSON.parse(atob(decodeURIComponent(match[1])));
+                    let b64 = decodeURIComponent(match[1]);
+                    b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+                    while (b64.length % 4) b64 += '=';
+                    payrollData = JSON.parse(atob(b64));
                 }
             } catch(e) {
                 payrollData = {};
@@ -2103,13 +2106,15 @@
                 const commissions = parseFloat(document.getElementById(`adm_com_${c.code}`).value) || 0;
                 const incentives = parseFloat(document.getElementById(`adm_inc_${c.code}`).value) || 0;
                 const bonuses = parseFloat(document.getElementById(`adm_bon_${c.code}`).value) || 0;
-                data[c.code] = { otHours, dedType, dedHours, commissions, incentives, bonuses };
+                if (otHours || dedType || commissions || incentives || bonuses) {
+                    data[c.code] = { otHours, dedType, dedHours, commissions, incentives, bonuses };
+                }
             });
 
             payrollData = data;
-            const encoded = encodeURIComponent(btoa(JSON.stringify(data)));
-            history.replaceState(null, '', '#d=' + encoded);
-            const link = `https://samodiofl-boop.github.io/beycome-invoices/#d=${encoded}`;
+            const b64 = btoa(JSON.stringify(data)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+            history.replaceState(null, '', '#d=' + b64);
+            const link = `https://samodiofl-boop.github.io/beycome-invoices/#d=${b64}`;
 
             const status = document.getElementById('adminSaveStatus');
             status.style.display = 'block';
