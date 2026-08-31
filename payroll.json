@@ -22,7 +22,7 @@
     "dedHours": 0,
     "commissions": 1025,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 100
   },
   "KSH3958": {
     "otHours": 0,
@@ -30,7 +30,7 @@
     "dedHours": 4.22,
     "commissions": 945,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 50
   },
   "IST2849": {
     "otHours": 0,
