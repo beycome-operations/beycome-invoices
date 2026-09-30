@@ -1,12 +1,12 @@
 {
-  "_period": "Aug 17 - Aug 30, 2026",
+  "_period": "Aug 31 - Sep 27, 2026",
   "ROS7392": {
-    "otHours": 0.53,
+    "otHours": 0,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 1120,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 40
   },
   "OMR5147": {
     "otHours": 0,
@@ -17,20 +17,20 @@
     "bonuses": 0
   },
   "MAR8264": {
-    "otHours": 23.93,
+    "otHours": 4.17,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 1050,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 125
   },
   "KSH3958": {
-    "otHours": 4.28,
+    "otHours": 0,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 865,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 45
   },
   "IST2849": {
     "otHours": 0,
@@ -49,71 +49,71 @@
     "bonuses": 0
   },
   "CHR4738": {
-    "otHours": 0,
-    "dedType": "hours",
-    "dedHours": 7.55,
-    "commissions": 0,
+    "otHours": 15,
+    "dedType": "",
+    "dedHours": 0,
+    "commissions": 305,
     "incentives": 0,
     "bonuses": 0
   },
   "KEN5827": {
-    "otHours": 19.53,
+    "otHours": 5.82,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 50
   },
   "WAR8472": {
-    "otHours": 6.95,
+    "otHours": 12,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 0
+    "bonuses": 50
   },
   "GIE2958": {
-    "otHours": 21.63,
+    "otHours": 16.33,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 200
+    "bonuses": 50
   },
   "KAR7361": {
-    "otHours": 14.05,
+    "otHours": 13.7,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 145
+    "bonuses": 105
   },
   "LIN6284": {
-    "otHours": 10.62,
+    "otHours": 35.47,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 108
+    "bonuses": 212
   },
   "ALV3947": {
-    "otHours": 18.45,
+    "otHours": 23.83,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 117
+    "bonuses": 142
   },
   "LAB7832": {
-    "otHours": 17.15,
+    "otHours": 6.37,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
     "incentives": 0,
-    "bonuses": 77
+    "bonuses": 14
   },
   "GRE5173": {
-    "otHours": 0,
+    "otHours": 11,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
