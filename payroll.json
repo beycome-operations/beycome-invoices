@@ -1,12 +1,12 @@
 {
-  "_period": "Sep 14 - Sep 27, 2026",
+  "_period": "Sep 28 - Oct 11, 2026",
   "ROS7392": {
-    "otHours": 0,
+    "otHours": 4.93,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 1245,
     "incentives": 0,
-    "bonuses": 100
+    "bonuses": 40
   },
   "OMR5147": {
     "otHours": 0,
@@ -17,20 +17,20 @@
     "bonuses": 0
   },
   "MAR8264": {
-    "otHours": 10.1,
+    "otHours": 13.32,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 820,
     "incentives": 0,
-    "bonuses": 85
+    "bonuses": 35
   },
   "KSH3958": {
     "otHours": 0,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 0,
+    "commissions": 725,
     "incentives": 0,
-    "bonuses": 100
+    "bonuses": 5
   },
   "IST2849": {
     "otHours": 0,
@@ -57,7 +57,7 @@
     "bonuses": 0
   },
   "KEN5827": {
-    "otHours": 1.87,
+    "otHours": 4.57,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -73,7 +73,7 @@
     "bonuses": 0
   },
   "GIE2958": {
-    "otHours": 14.38,
+    "otHours": 0,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -81,7 +81,7 @@
     "bonuses": 0
   },
   "KAR7361": {
-    "otHours": 10.03,
+    "otHours": 11.72,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -89,7 +89,7 @@
     "bonuses": 0
   },
   "LIN6284": {
-    "otHours": 28.72,
+    "otHours": 25,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -97,7 +97,7 @@
     "bonuses": 0
   },
   "ALV3947": {
-    "otHours": 25.48,
+    "otHours": 23.02,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
