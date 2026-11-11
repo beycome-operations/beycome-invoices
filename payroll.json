@@ -1,12 +1,12 @@
 {
-  "_period": "Sep 28 - Oct 11, 2026",
+  "_period": "Oct 12 - Oct 25, 2026",
   "ROS7392": {
-    "otHours": 4.93,
+    "otHours": 2.42,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 1245,
+    "commissions": 0,
     "incentives": 0,
-    "bonuses": 40
+    "bonuses": 65
   },
   "OMR5147": {
     "otHours": 0,
@@ -17,18 +17,18 @@
     "bonuses": 0
   },
   "MAR8264": {
-    "otHours": 13.32,
+    "otHours": 9.97,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 820,
+    "commissions": 0,
     "incentives": 0,
-    "bonuses": 35
+    "bonuses": 85
   },
   "KSH3958": {
     "otHours": 0,
     "dedType": "",
     "dedHours": 0,
-    "commissions": 725,
+    "commissions": 0,
     "incentives": 0,
     "bonuses": 5
   },
@@ -57,22 +57,14 @@
     "bonuses": 0
   },
   "KEN5827": {
-    "otHours": 4.57,
-    "dedType": "",
-    "dedHours": 0,
+    "otHours": 0,
+    "dedType": "hours",
+    "dedHours": 4.72,
     "commissions": 0,
     "incentives": 0,
     "bonuses": 0
   },
   "WAR8472": {
-    "otHours": 6,
-    "dedType": "",
-    "dedHours": 0,
-    "commissions": 0,
-    "incentives": 0,
-    "bonuses": 0
-  },
-  "GIE2958": {
     "otHours": 0,
     "dedType": "",
     "dedHours": 0,
@@ -80,8 +72,16 @@
     "incentives": 0,
     "bonuses": 0
   },
+  "GIE2958": {
+    "otHours": 13.87,
+    "dedType": "",
+    "dedHours": 0,
+    "commissions": 0,
+    "incentives": 0,
+    "bonuses": 0
+  },
   "KAR7361": {
-    "otHours": 11.72,
+    "otHours": 0.08,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -89,7 +89,7 @@
     "bonuses": 0
   },
   "LIN6284": {
-    "otHours": 25,
+    "otHours": 20.23,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -97,7 +97,7 @@
     "bonuses": 0
   },
   "ALV3947": {
-    "otHours": 23.02,
+    "otHours": 11.95,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
@@ -105,7 +105,7 @@
     "bonuses": 0
   },
   "LAB7832": {
-    "otHours": 10.2,
+    "otHours": 17,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
