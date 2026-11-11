@@ -61,7 +61,7 @@
     "dedType": "hours",
     "dedHours": 4.72,
     "commissions": 0,
-    "incentives": 0,
+    "incentives": 31.6,
     "bonuses": 0
   },
   "WAR8472": {
@@ -81,7 +81,7 @@
     "bonuses": 0
   },
   "KAR7361": {
-    "otHours": 0.08,
+    "otHours": 9,
     "dedType": "",
     "dedHours": 0,
     "commissions": 0,
